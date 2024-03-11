@@ -343,7 +343,7 @@ router.post('/passwordCli', async (req, res) => {
 
     if (user) {
       const hashedPass = await generarHash(password)
-      const changePass = await prisma.cliente.update({
+      const changePass = await prisma.cliente.updateMany({
         where:{
           email:email
         },
@@ -379,7 +379,7 @@ router.post('/passwordCliEn', async (req, res) => {
 
     if (user) {
       const hashedPass = await generarHash(password)
-      const changePass = await prisma.cliente.update({
+      const changePass = await prisma.cliente.updateMany({
         where:{
           idCli:idCli
         },
