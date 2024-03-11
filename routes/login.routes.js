@@ -79,7 +79,7 @@ router.post("/loginCli", async (req,res) =>{
     console.log(passwordsMatch)
 
     if(passwordsMatch){
-      const token = jwt.sign({ nombre: user.nombre, apellidos: user.apellidos, email: user.email, direccion: user.direccion, telefono: user.telefono, tipoDoc: user.tipoDoc,  fecha_nac: user.fecha_nac, estado: user.estado }, SECRET_KEY, { expiresIn: '2h' })
+      const token = jwt.sign({ idCli:user.idCli, nombre: user.nombre, apellidos: user.apellidos, email: user.email, direccion: user.direccion, telefono: user.telefono, tipoDoc: user.tipoDoc,  fecha_nac: user.fecha_nac, estado: user.estado }, SECRET_KEY, { expiresIn: '2h' })
       res.status(200).json({ token });
     }else{
       res.status(200).json({message:"Error, credenciales incorrectas"})
