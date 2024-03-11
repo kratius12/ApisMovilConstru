@@ -69,4 +69,28 @@ router.get('/cliente/:id', async (req, res) => {
     }
 });
 
+router.post('/cliente', async (req, res) => {
+
+    const { nombre, apellidos, email, direccion, telefono, tipoDoc, cedula, fecha_nac, estado, contrasena } = req.body
+    let date = new Date(fecha_nac)
+    const { hash, salt } = await generarHash(contrasena);
+    const result = await prisma.cliente.create({
+        data: {
+            nombre: ucfirst(nombre),
+            apellidos: ucfirst(apellidos),
+            email: email,
+            direccion: ucfirst(direccion),
+            telefono: telefono,
+            tipoDoc: tipoDoc,
+            cedula: cedula,
+            fecha_nac: fecha_nac,
+            estado: parseInt(estado),
+            constrasena: hash,
+        }
+    })
+
+    res.status(200).json(result);
+
+});
+
 export default router
