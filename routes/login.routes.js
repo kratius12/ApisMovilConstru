@@ -343,12 +343,12 @@ router.post('/passwordCli', async (req, res) => {
 
     if (user) {
       const hashedPass = await generarHash(password)
-      const changePass = await prisma.empleado.update({
+      const changePass = await prisma.cliente.update({
         where:{
           email:email
         },
         data:{
-          contrasena: hashedPass
+          constrasena: hashedPass
         }
       })
 
@@ -384,7 +384,7 @@ router.post('/passwordCliEn', async (req, res) => {
           idCli:idCli
         },
         data:{
-          contrasena: hashedPass
+          constrasena: hashedPass
         }
       })
 
