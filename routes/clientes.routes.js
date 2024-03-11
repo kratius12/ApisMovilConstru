@@ -1,8 +1,16 @@
 import {Router, json} from 'express';
 import { PrismaClient } from '@prisma/client';
 import { ucfirst } from "../plugins.js";
+import bcrypt from "bcrypt"
 const prisma = new PrismaClient();
 const router = Router();
+
+const generarHash = async (password, saltRounds = 10) => {
+    const salt = await bcrypt.genSalt(saltRounds);
+    const hash = await bcrypt.hash(password, salt);
+    return { hash, salt };
+};
+
 
 router.get("/checkEmail/:email/:id", async (req, res) => {
     try {
