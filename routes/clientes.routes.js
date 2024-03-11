@@ -45,6 +45,7 @@ router.get("/checkEmail/:email/:id", async (req, res) => {
 
 router.get('/cliente/:id', async (req, res) => {
     try {
+        console.log(req.params.id)
         const result = await prisma.cliente.findFirst({
             where: {
                 idCli: parseInt(req.params.id)
