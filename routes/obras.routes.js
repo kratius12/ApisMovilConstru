@@ -163,9 +163,9 @@ router.post("/AddActividadMov",async(req,res)=>{
         idObra: parseInt(idObra)
       }
     })
-    return res.status(200).json({message: "excelente mi papacho"})
+    return res.status(200)
   } catch (error) {
-    console.error(error)
+    return res.status(500).json({message:error})
   }
 })
 
