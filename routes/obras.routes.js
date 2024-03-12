@@ -148,7 +148,7 @@ router.post("/AddActividadMov",async(req,res)=>{
       data:{
         actividad: actividad,
         fechaini: fechaini,
-        fechafin: fechafin,
+        fechafin: parseInt(fechafin),
         estado: estado,
         idObra: parseInt(idObra)
       }
