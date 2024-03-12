@@ -163,7 +163,7 @@ router.post("/AddActividadMov",async(req,res)=>{
       }
     })
   } catch (error) {
-    
+    console.error(error)
   }
 })
 
