@@ -140,4 +140,31 @@ router.get("/obrasEmp/:id", async (req, res) => {
     }
   });
 
+router.post("AddActividadMov",async(req,res)=>{
+  try {
+    const {actividad, fechaini, fechafin, estado, idEmp, idObra} = req.body
+    const activida = await prisma.detalle_obra.create({
+      data:{
+        actividad: actividad,
+        fechaini: fechaini,
+        fechafin: fechafin,
+        estado: estado,
+        idObra: parseInt(idObra)
+      }
+      
+    }
+    
+    )
+    const emps = await prisma.actividades_empleados.create({
+      data:{
+        actividad: activida.actividad,
+        idEmp: parseInt(idEmp),
+        idObra: parseInt(idObra)
+      }
+    })
+  } catch (error) {
+    
+  }
+})
+
 export default router
