@@ -88,6 +88,8 @@ router.get("/obrasEmp/:id", async (req, res) => {
         },
         include: {
           empleado: true,
+          cliente:true,
+          detalle_obra: true,
         },
       });
   
