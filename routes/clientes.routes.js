@@ -11,6 +11,32 @@ const generarHash = async (password, saltRounds = 10) => {
     return { hash, salt };
 };
 
+router.put('/clienteMo/:id', async (req, res) => {
+
+    try {
+            const {nombre,apellidos, email, direccion, telefono, tipoDoc, cedula, fecha_nac, } = req.body
+            const result = await prisma.cliente.update({
+                    where:{
+                            idCli: parseInt(req.params.id)
+                    },data:{
+                            nombre: ucfirst(nombre),
+                            apellidos:ucfirst(apellidos),
+                            email: email,
+                            direccion: ucfirst(direccion),
+                            telefono: telefono,
+                            tipoDoc: tipoDoc,
+                            cedula: cedula,
+                            fecha_nac: fecha_nac,
+                    }
+            })
+            
+            res.status(200)
+    } catch (error) {
+            console.log(error);
+            return res.status(500).json(error)
+    }
+
+});
 
 router.get("/checkEmail/:email/:id", async (req, res) => {
     try {
