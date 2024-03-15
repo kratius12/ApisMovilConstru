@@ -13,7 +13,6 @@ import especialidadRoutes from "./routes/especialidades.routes.js"
 import categoriasRoutes from "./routes/categorias.routes.js"
 import proveedoresRoutes from './routes/proveedores.routes.js'
 import rolesRoutes from "./routes/roles.routes.js";
-import usuariosRoutes from "./routes/usuarios.routes.js";
 import permisosRoutes from "./routes/permisos.routes.js";
 import comprasRoutes from './routes/compras.routes.js'
 import dashboardRoutes from './routes/dashboard.routes.js'
