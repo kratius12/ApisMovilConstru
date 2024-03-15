@@ -38,7 +38,6 @@ app.use(proveedoresRoutes)
 app.use(especialidadRoutes)
 app.use(categoriasRoutes)
 app.use(rolesRoutes)
-app.use(usuariosRoutes)
 app.use(permisosRoutes)
 app.use(comprasRoutes)
 app.use('/images', express.static(path.join(__dirname, 'images')));
