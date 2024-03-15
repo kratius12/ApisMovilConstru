@@ -127,4 +127,106 @@ router.post('/cliente', async (req, res) => {
 
 });
 
+router.get('/clientes', async (req, res) =>{
+    try {
+        const result = await prisma.cliente.findMany()
+        res.status(200).json(result)
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json(error)
+    }
+});
+
+router.put('/cliente/:id', async (req, res) => {
+    try {
+            const {nombre,apellidos, email, direccion, telefono, tipoDoc, cedula, fecha_nac, contrasena} = req.body
+            const { hash, salt } = await generarHash(contrasena);
+            const result = await prisma.cliente.update({
+                    where:{
+                            idCli: parseInt(req.params.id)
+                    },data:{
+                            nombre: ucfirst(nombre),
+                            apellidos:ucfirst(apellidos),
+                            email: email,
+                            direccion: ucfirst(direccion),
+                            telefono: telefono,
+                            tipoDoc: tipoDoc,
+                            cedula: cedula,
+                            fecha_nac: fecha_nac,
+                            constrasena:hash,
+                            salt:salt
+                    }
+            })
+            
+            res.status(200).json(result)
+    } catch (error) {
+            console.log(error);
+            return res.status(500).json(error)
+    }
+});
+
+router.put("/clientStatus/:id", async (req, res) => {
+    try {
+        const {status} = req.body
+        const result = await prisma.cliente.update({
+            where:{
+                idCli:parseInt(req.params.id)
+            },
+            data:{
+                estado:parseInt(status)
+            }
+        })        
+        return res.status(200).json(result)
+
+    } catch (error) {
+        return res.status(500).json({message: error.message})
+    }
+})
+router.get("/checkDoc/:cedula/:tipoDoc/:id", async (req, res) => {
+    try {
+        if (parseInt(req.params.id) > 0) {
+            const result = await prisma.cliente.findFirst({
+                where:{
+                    cedula:{
+                        equals:req.params.cedula
+                    },
+                    tipoDoc:{
+                        equals: req.params.tipoDoc
+                    },
+                    idCli:{
+                        not: parseInt(req.params.id)
+                     }
+                },
+                select:{
+                 cedula:true,
+                 tipoDoc:true
+                }
+            })       
+            if (result) {
+                return res.status(203).json({message: 'El documento ingresado ya existe'})                
+            }
+            return res.status(200).json({message: result})            
+        } else {
+            const result = await prisma.cliente.findFirst({
+                where:{
+                 AND:{
+                  cedula:req.params.cedula,
+                  tipoDoc:req.params.tipoDoc
+                 }
+                },
+                select:{
+                 cedula:true,
+                 tipoDoc:true
+                }
+            })       
+            if (result) {
+                return res.status(203).json({message: 'El documento ingresado ya existe'})                
+            }
+            return res.status(200).json({message: result})            
+        }
+    } catch (error) {
+        return res.status(500).json({message: error.message})
+    }
+})
+
 export default router
