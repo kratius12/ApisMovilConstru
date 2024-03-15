@@ -30,7 +30,7 @@ router.put('/clienteMo/:id', async (req, res) => {
                     }
             })
             
-            res.status(200)
+            res.status(200).json({meesage: "Cliente editado con exito"})
     } catch (error) {
             console.log(error);
             return res.status(500).json(error)
