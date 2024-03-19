@@ -143,34 +143,7 @@ router.get("/obrasEmp/:id", async (req, res) => {
     }
   });
 
-router.post("/AddActividadMov",async(req,res)=>{
-  try {
-    const {actividad, fechaini, fechafin, estado, idEmp, idObra} = req.body
-    console.log(req.body)
-    const activida = await prisma.detalle_obra.create({
-      data:{
-        actividad: actividad,
-        fechaini: fechaini,
-        fechafin: parseInt(fechafin),
-        estado: estado,
-        idObra: parseInt(idObra)
-      }
-      
-    }
-    
-    )
-    const emps = await prisma.actividades_empleados.create({
-      data:{
-        actividad: activida.actividad,
-        idEmp: parseInt(idEmp),
-        idObra: parseInt(idObra)
-      }
-    })
-    return res.status(200)
-  } catch (error) {
-    return res.status(500).json({message:error})
-  }
-})
+
 
 
 router.get("/obras", async (req, res) => {
@@ -350,34 +323,40 @@ router.get("/actividades/:id", async (req, res) => {
 router.post("/guardarActividad/:id", async (req, res) => {
   try {
     const { actividad, fechaini, fechafin, estado, antiguo, empleados, materiales } = req.body;
-    if (materiales.lengt == 0) {
-      for (const material of materiales) {
-        
-          const idMaterial = parseInt(material.material.value);
-          const cantidadUtilizada = parseInt(material.cantidad);
+    if(materiales.length != 0){
+    for (const material of materiales) {
+      const idMaterial = parseInt(material.material.value);
+      const cantidadUtilizada = parseInt(material.cantidad);
 
-          // Obtener información del material desde la base de datos
-          const materialDB = await prisma.materiales.findFirst({
-            where: {
-              idMat: parseInt(material.material.value),
-            },
-          });
-          // Restar la cantidad utilizada al material
-          const nuevaCantidad = materialDB.cantidad - cantidadUtilizada;
+      // Obtener información del material desde la base de datos
+      const materialDB = await prisma.materiales.findFirst({
+        where: {
+          idMat: parseInt(material.material.value),
+        },
+      });
+      // Restar la cantidad utilizada al material
+      const nuevaCantidad = materialDB.cantidad - cantidadUtilizada;
 
-          if (nuevaCantidad == 0) {
-            await prisma.materiales.update({
-              where: {
-                idMat: idMaterial
-              },
-              data: {
-                estado: 0
-              }
-            })
+      // Actualizar la cantidad en la base de datos
+      await prisma.materiales.update({
+        where: {
+          idMat: idMaterial,
+        },
+        data: {
+          cantidad: nuevaCantidad,
+        },
+      });
+      if (nuevaCantidad == 0) {
+        await prisma.materiales.update({
+          where: {
+            idMat: idMaterial
+          },
+          data: {
+            estado: 0
           }
-        
+        })
       }
-    }
+    }}
     if (antiguo) {
       // Delete the old activity
       await prisma.detalle_obra.deleteMany({
@@ -393,6 +372,21 @@ router.post("/guardarActividad/:id", async (req, res) => {
           ]
         }
       });
+      await prisma.actividades_materiales.updateMany({
+        where: {
+          AND: [
+            {
+              actividad: {
+                equals: antiguo
+              }
+            }, {
+              idObra: parseInt(req.params.id)
+            }
+          ]
+        },data:{
+          actividad:actividad
+        }
+      })
       await prisma.actividades_empleados.deleteMany({
         where: {
           AND: [
@@ -418,7 +412,8 @@ router.post("/guardarActividad/:id", async (req, res) => {
         idObra: parseInt(req.params.id)
       }
     });
-    if (materiales.lengt >0){
+
+    if(materiales.length!=0){
     for (const material of materiales) {
       await prisma.actividades_materiales.createMany({
         data: {
@@ -429,7 +424,6 @@ router.post("/guardarActividad/:id", async (req, res) => {
         }
       })
     }}
-    
     for (const empleado of empleados) {
       const meps = await prisma.actividades_empleados.createMany({
         data: {
