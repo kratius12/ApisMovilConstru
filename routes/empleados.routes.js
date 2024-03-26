@@ -188,6 +188,7 @@ router.put("/empleado/:id", async (req, res) => {
                     contrasena: hash,
                 }
             })
+            console.log("Sin cambio de contra");
         }else{
             await prisma.empleado.update({
                 where: {
@@ -203,6 +204,7 @@ router.put("/empleado/:id", async (req, res) => {
                     email: email,
                 }
             })
+            console.log("Con cambio de contra");
         }
         if (especialidad.length > 0) {
             const result2 = await prisma.empleado_especialidad.deleteMany({
