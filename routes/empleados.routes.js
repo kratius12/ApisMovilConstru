@@ -172,7 +172,7 @@ router.put("/empleado/:id", async (req, res) => {
         const { nombre, apellidos, direccion, telefono, tipoDoc, cedula, especialidad, email, contrasena, rol } = req.body
         const { hash, salt } = await generarHash(contrasena);
         console.log(contrasena);
-        if(contrasena != null){
+        if(contrasena ==""){
             await prisma.empleado.update({
                 where: {
                     idEmp: parseInt(req.params.id)
