@@ -120,6 +120,7 @@ router.post('/cliente', async (req, res) => {
             fecha_nac: fecha_nac,
             estado: parseInt(estado),
             constrasena: hash,
+            salt:salt
         }
     })
 
@@ -178,7 +179,6 @@ router.put('/cliente/:id', async (req, res) => {
                             tipoDoc: tipoDoc,
                             cedula: cedula,
                             fecha_nac: fecha_nac,
-                            constrasena:hash,
                     }
             })
             
