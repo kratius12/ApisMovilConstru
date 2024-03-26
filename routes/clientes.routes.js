@@ -163,8 +163,7 @@ router.get('/cliente/:id', async (req, res) => {
 router.put('/cliente/:id', async (req, res) => {
 
     try {
-            const {nombre,apellidos, email, direccion, telefono, tipoDoc, cedula, fecha_nac, contrasena} = req.body
-            const { hash, salt } = await generarHash(contrasena);
+            const {nombre,apellidos, email, direccion, telefono, tipoDoc, cedula, fecha_nac} = req.body
             const result = await prisma.cliente.update({
                     where:{
                             idCli: parseInt(req.params.id)
