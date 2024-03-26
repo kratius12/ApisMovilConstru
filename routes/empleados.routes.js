@@ -185,7 +185,7 @@ router.put("/empleado/:id", async (req, res) => {
                     tipoDoc: tipoDoc,
                     cedula: cedula,
                     email: email,
-                    contrasena: hash,
+                    
                 }
             })
             console.log("Sin cambio de contra");
@@ -202,6 +202,7 @@ router.put("/empleado/:id", async (req, res) => {
                     tipoDoc: tipoDoc,
                     cedula: cedula,
                     email: email,
+                    contrasena: hash,
                 }
             })
             console.log("Con cambio de contra");
