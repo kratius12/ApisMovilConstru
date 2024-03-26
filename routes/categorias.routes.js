@@ -5,7 +5,7 @@ import { ucfirst } from "../plugins.js";
 const prisma = new PrismaClient()
 const router = Router()
 
-router.get("/categorias", async (req, res) =>{
+router.get("categorias", async (req, res) =>{
     try {
         const result = await prisma.categoria.findMany()
         res.status(200).json(result)
