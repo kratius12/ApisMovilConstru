@@ -120,7 +120,7 @@ router.post('/cliente', async (req, res) => {
             fecha_nac: fecha_nac,
             estado: parseInt(estado),
             constrasena: hash,
-            salt:salt
+
         }
     })
 
