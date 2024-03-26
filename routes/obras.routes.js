@@ -1,150 +1,11 @@
 import { Router, json } from "express";
+import { format, addDays, max } from 'date-fns';
 import { PrismaClient } from "@prisma/client";
 import { ucfirst } from "../plugins.js";
-import {format} from "date-fns"
+
 
 const prisma = new PrismaClient()
 const router = Router()
-
-router.put("/estadoAct/:id", async (req, res) => {
-    try {
-        const { estado } = req.body
-
-        const actividad = await prisma.detalle_obra.update({
-            where: {
-                id: parseInt(req.params.id)
-            }, data: {
-                estado: estado
-            }
-        }
-        )
-
-        setTimeout(() => {
-            return res.status(200).json({ message: "Delayed response after 10 seconds" });
-        }, 100);
-    } catch (error) {
-        console.log(error)
-    }
-})
-
-router.get("/obrasEmp/:id", async (req, res) => {
-    try {
-      const obras = await prisma.obras.findMany({
-        where: {
-          idEmp: parseInt(req.params.id),
-        },
-        include: {
-          detalle_obra: true,
-          actividades_empleados: true,
-          empleado: true,
-          cliente: true
-        },
-      });
-  
-      const obrasAct = await prisma.actividades_empleados.findMany({
-        where: {
-          idEmp: parseInt(req.params.id),
-        },
-        include: {
-          obras: true,
-        },
-      });
-  
-      
-  
-      // Utilizamos un Set para almacenar las obras únicas
-      const obrasUnicas = new Set();
-  
-      obras.forEach((obra) => {
-        obrasUnicas.add(JSON.stringify(obra));
-      });
-  
-      // obrasAct.forEach((actividad) => {
-      //   actividad.obras.forEach((obra) => {
-      //     obrasUnicas.add(JSON.stringify(obra));
-      //   });
-      // });
-  
-      // Convertimos nuevamente las obras a objetos antes de enviar la respuesta
-      const obrasUnicasArray = Array.from(obrasUnicas).map((obraString) =>
-        JSON.parse(obraString)
-      );
-  
-      const info = {
-        obras: obrasUnicasArray,
-      };
-  
-      return res.status(200).json(info);
-    } catch (error) {
-      console.error(error);
-      return res.status(500).json({ error: "Error interno del servidor" });
-    }
-  });
-
-  router.get("/obrasCli/:id", async (req, res) => {
-    try {
-      const obras = await prisma.obras.findMany({
-        where: {
-          idCliente: parseInt(req.params.id),
-        },
-        include: {
-          empleado: true,
-          cliente:true,
-          detalle_obra: true,
-        },
-      });
-  
-      const obrasAct = await prisma.actividades_empleados.findMany({
-        where: {
-          idEmp: parseInt(req.params.id),
-        },
-        include: {
-          obras: true,
-        },
-      });
-  
-      // Utilizamos un Set para almacenar las obras únicas
-      const obrasUnicas = new Set();
-  
-      obras.forEach((obra) => {
-        obrasUnicas.add(JSON.stringify(obra));
-      });
-      const obrasUnicasArray = Array.from(obrasUnicas).map((obraString) =>
-        JSON.parse(obraString)
-      );
-  
-      const info = {
-        obras: obrasUnicasArray,
-      };
-  
-      return res.status(200).json(info);
-    } catch (error) {
-      console.error(error);
-      return res.status(500).json({ error: "Error interno del servidor" });
-    }
-  })
-
-  router.post("/obras", async (req, res) => {
-    try {
-      const { descripcion, fechaini, idCliente, idEmp } = req.body;
-      const obra = await prisma.obras.create({
-        data: {
-          descripcion: ucfirst(descripcion),
-          fechaini: fechaini,
-          estado: "Pendiente",
-          idCliente: parseInt(idCliente),
-          idEmp: parseInt(idEmp)
-        },
-      });
-      res.status(200).json(obra);
-    } catch (error) {
-      console.log("message:" + error.message);
-      return res.status(500).json({ message: error.message });
-    }
-  });
-
-
-
 
 router.get("/obras", async (req, res) => {
   try {
@@ -193,7 +54,8 @@ router.get("/obra/:id", async (req, res) => {
           select: {
             idCli: true,
             nombre: true,
-            apellidos: true
+            apellidos: true,
+            direccion:true
           }
         }
       }
@@ -230,6 +92,25 @@ router.get("/obra/:id", async (req, res) => {
     return res.status(500).json({ message: error.message })
   }
 })
+
+router.post("/obras", async (req, res) => {
+  try {
+    const { descripcion, fechaini, idCliente, idEmp } = req.body;
+    const obra = await prisma.obras.create({
+      data: {
+        descripcion: ucfirst(descripcion),
+        fechaini: fechaini,
+        estado: "Pendiente",
+        idCliente: parseInt(idCliente),
+        idEmp: parseInt(idEmp)
+      },
+    });
+    res.status(200).json(obra);
+  } catch (error) {
+    console.log("message:" + error.message);
+    return res.status(500).json({ message: error.message });
+  }
+});
 
 
 router.put("/obra/:id", async (req, res) => {
@@ -319,6 +200,8 @@ router.get("/actividades/:id", async (req, res) => {
     res.status(500).send('Error interno del servidor');
   }
 });
+
+
 
 router.post("/guardarActividad/:id", async (req, res) => {
   try {
@@ -493,6 +376,7 @@ router.put("/updateDate/:id", async (req,res)=>{
   }
 })
 
+
 router.get("/actividadA/:id", async (req, res) => {
   try {
     const { actividad } = req.body
@@ -513,7 +397,7 @@ router.get("/actividadA/:id", async (req, res) => {
   } catch (error) {
     console.log(error)
   }
-})
+})  
 
 router.get("/searchActividad/:id", async (req, res) => {
   try {
@@ -542,5 +426,117 @@ router.get("/searchActividad/:id", async (req, res) => {
 
   }
 })
+
+router.get("/obrasCli/:id", async (req, res) => {
+  try {
+    const obras = await prisma.obras.findMany({
+      where: {
+        idCliente: parseInt(req.params.id),
+      },
+      include: {
+        empleado: true,
+      },
+    });
+
+    const obrasAct = await prisma.actividades_empleados.findMany({
+      where: {
+        idEmp: parseInt(req.params.id),
+      },
+      include: {
+        obras: true,
+      },
+    });
+    // Utilizamos un Set para almacenar las obras únicas
+    const obrasUnicas = new Set();
+
+    obras.forEach((obra) => {
+      obrasUnicas.add(JSON.stringify(obra));
+    });
+    const obrasUnicasArray = Array.from(obrasUnicas).map((obraString) =>
+      JSON.parse(obraString)
+    );
+
+    const info = {
+      obras: obrasUnicasArray,
+    };
+
+    return res.status(200).json(info);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: "Error interno del servidor" });
+  }
+})
+
+router.get("/obrasEmp/:id", async (req, res) => {
+  try {
+    const obras = await prisma.obras.findMany({
+      where: {
+        idEmp: parseInt(req.params.id),
+      },
+      include: {
+        detalle_obra: true,
+        actividades_empleados: true,
+        empleado: true,
+        cliente: true
+      },
+    });
+
+    const obrasAct = await prisma.actividades_empleados.findMany({
+      where: {
+        idEmp: parseInt(req.params.id),
+      },
+      include: {
+        obras: true,
+      },
+    });
+    // Utilizamos un Set para almacenar las obras únicas
+    const obrasUnicas = new Set();
+
+    obras.forEach((obra) => {
+      obrasUnicas.add(JSON.stringify(obra));
+    });
+
+    // obrasAct.forEach((actividad) => {
+    //   actividad.obras.forEach((obra) => {
+    //     obrasUnicas.add(JSON.stringify(obra));
+    //   });
+    // });
+
+    // Convertimos nuevamente las obras a objetos antes de enviar la respuesta
+    const obrasUnicasArray = Array.from(obrasUnicas).map((obraString) =>
+      JSON.parse(obraString)
+    );
+
+    const info = {
+      obras: obrasUnicasArray,
+    };
+
+    return res.status(200).json(info);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: "Error interno del servidor" });
+  }
+});
+
+
+router.put("/estadoAct/:id", async (req, res) => {
+  try {
+    const { estado } = req.body
+    const actividad = await prisma.detalle_obra.update({
+      where: {
+        id: parseInt(req.params.id)
+      }, data: {
+        estado: estado
+      }
+    }
+    )
+    return res.status(200).json({ message: actividad })
+  } catch (error) {
+    console.log(error)
+  }
+})
+
+
+
 
 export default router

@@ -1,6 +1,7 @@
 import {Router, json} from 'express';
 import { PrismaClient } from '@prisma/client';
 import { ucfirst } from "../plugins.js";
+import bcrypt from "bcrypt"
 const prisma = new PrismaClient();
 const router = Router();
 
