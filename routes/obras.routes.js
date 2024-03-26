@@ -233,6 +233,7 @@ router.post("/guardarActividad/:id", async (req, res) => {
           where: {
             idMat: idMaterial,
             actividad: ucfirst(actividad),
+            idObra: parseInt(req.params.id)
           },
         });
 
