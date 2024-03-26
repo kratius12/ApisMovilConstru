@@ -246,6 +246,8 @@ router.post("/guardarActividad/:id", async (req, res) => {
                 },
                 {
                   idMat: idMaterial
+                },{
+                  idObra:parseInt(req.params.id)
                 }
               ]
               
