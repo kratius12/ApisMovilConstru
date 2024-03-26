@@ -104,7 +104,7 @@ router.get('/cliente/:id', async (req, res) => {
 });
 
 router.post('/cliente', async (req, res) => {
-
+    
     const { nombre, apellidos, email, direccion, telefono, tipoDoc, cedula, fecha_nac, estado, contrasena } = req.body
     let date = new Date(fecha_nac)
     const { hash, salt } = await generarHash(contrasena);
@@ -127,7 +127,7 @@ router.post('/cliente', async (req, res) => {
 
 });
 
-router.get('/clientes', async (req, res) =>{
+router.get('/clientes', async (req, res) => {
     try {
         const result = await prisma.cliente.findMany()
         res.status(200).json(result)
@@ -137,7 +137,32 @@ router.get('/clientes', async (req, res) =>{
     }
 });
 
+router.get('/cliente/:id', async (req, res) => {
+    try {
+        const result = await prisma.cliente.findFirst({
+            where: {
+                idCli: parseInt(req.params.id)
+            }, select: {
+                constrasena: false,
+                nombre: true,
+                apellidos: true,
+                tipoDoc: true,
+                cedula: true,
+                direccion: true,
+                email: true,
+                estado: true,
+                fecha_nac: true,
+                telefono: true
+            }
+        })
+        res.status(200).json(result);
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json(error);
+    }
+});
 router.put('/cliente/:id', async (req, res) => {
+
     try {
             const {nombre,apellidos, email, direccion, telefono, tipoDoc, cedula, fecha_nac, contrasena} = req.body
             const { hash, salt } = await generarHash(contrasena);
@@ -154,7 +179,6 @@ router.put('/cliente/:id', async (req, res) => {
                             cedula: cedula,
                             fecha_nac: fecha_nac,
                             constrasena:hash,
-                            salt:salt
                     }
             })
             
@@ -163,8 +187,8 @@ router.put('/cliente/:id', async (req, res) => {
             console.log(error);
             return res.status(500).json(error)
     }
-});
 
+});
 router.put("/clientStatus/:id", async (req, res) => {
     try {
         const {status} = req.body
