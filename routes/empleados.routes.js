@@ -171,21 +171,38 @@ router.put("/empleado/:id", async (req, res) => {
     try {
         const { nombre, apellidos, direccion, telefono, tipoDoc, cedula, especialidad, email, contrasena, rol } = req.body
         const { hash, salt } = await generarHash(contrasena);
-        const result = await prisma.empleado.update({
-            where: {
-                idEmp: parseInt(req.params.id)
-            },
-            data: {
-                nombre: ucfirst(nombre),
-                apellidos: ucfirst(apellidos),
-                direccion: ucfirst(direccion),
-                telefono: telefono,
-                tipoDoc: tipoDoc,
-                cedula: cedula,
-                email: email,
-                contrasena: hash,
-            }
-        })
+        if(contrasena != null){
+            await prisma.empleado.update({
+                where: {
+                    idEmp: parseInt(req.params.id)
+                },
+                data: {
+                    nombre: ucfirst(nombre),
+                    apellidos: ucfirst(apellidos),
+                    direccion: ucfirst(direccion),
+                    telefono: telefono,
+                    tipoDoc: tipoDoc,
+                    cedula: cedula,
+                    email: email,
+                    contrasena: hash,
+                }
+            })
+        }else{
+            await prisma.empleado.update({
+                where: {
+                    idEmp: parseInt(req.params.id)
+                },
+                data: {
+                    nombre: ucfirst(nombre),
+                    apellidos: ucfirst(apellidos),
+                    direccion: ucfirst(direccion),
+                    telefono: telefono,
+                    tipoDoc: tipoDoc,
+                    cedula: cedula,
+                    email: email,
+                }
+            })
+        }
         if (especialidad.length > 0) {
             const result2 = await prisma.empleado_especialidad.deleteMany({
                 where: {
