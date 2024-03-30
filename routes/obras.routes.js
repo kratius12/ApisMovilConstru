@@ -115,7 +115,7 @@ router.post("/obras", async (req, res) => {
 
 router.put("/obra/:id", async (req, res) => {
   try {
-    const { descripcion, area, idCliente, estado, fechafin, fechaini, precio } = req.body;
+    const { descripcion, area, idCliente, estado, fechafin, fechaini, precio, idEmp } = req.body;
     const result = await prisma.obras.update({
       where: {
         idObra: parseInt(req.params.id)
@@ -126,9 +126,9 @@ router.put("/obra/:id", async (req, res) => {
         estado: estado,
         fechaini: fechaini,
         fechafin: fechafin,
+        idEmp: parseInt(idEmp),
         idCliente: parseInt(idCliente),
         precio: parseInt(precio),
-
       }
     });
   } catch (error) {
@@ -229,48 +229,32 @@ router.post("/guardarActividad/:id", async (req, res) => {
           },
         });
 
-        const existeActividadMaterial = await prisma.actividades_materiales.findFirst({
+        const actividadMaterialExistente = await prisma.actividades_materiales.findFirst({
           where: {
+            idObra: parseInt(req.params.id),
             idMat: idMaterial,
-            actividad: ucfirst(actividad),
-            idObra: parseInt(req.params.id)
+            actividad: ucfirst(actividad)
+
           },
         });
-
-        if (existeActividadMaterial) {
-          await prisma.actividades_materiales.updateMany({
+        if (actividadMaterialExistente) {
+          await prisma.actividades_materiales.update({
             where: {
-              AND:[
-                {
-                  actividad: ucfirst(actividad)
-                },
-                {
-                  idMat: idMaterial
-                },{
-                  idObra:parseInt(req.params.id)
-                }
-              ]
-              
+              id: actividadMaterialExistente.id,
             },
             data: {
-              cantidad: {
-                increment: cantidadUtilizada,
-              },
+              cantidad: actividadMaterialExistente.cantidad + cantidadUtilizada,
             },
           });
         } else {
-          if (materiales.length != 0) {
-            for (const material of materiales) {
-              await prisma.actividades_materiales.createMany({
-                data: {
-                  actividad: ucfirst(actividad),
-                  cantidad: parseInt(material.cantidad),
-                  idMat: parseInt(material.material.value),
-                  idObra: parseInt(req.params.id)
-                }
-              });
-            }
-          }
+          await prisma.actividades_materiales.create({
+            data: {
+              actividad: ucfirst(actividad),
+              cantidad: cantidadUtilizada,
+              idMat: idMaterial,
+              idObra: parseInt(req.params.id),
+            },
+          });
         }
 
         if (nuevaCantidad == 0) {
@@ -343,10 +327,8 @@ router.post("/guardarActividad/:id", async (req, res) => {
       }
     });
 
-    
-
     for (const empleado of empleados) {
-      await prisma.actividades_empleados.createMany({
+      await prisma.actividades_empleados.create({
         data: {
           actividad: ucfirst(actividad),
           idEmp: parseInt(empleado.value),
@@ -361,6 +343,7 @@ router.post("/guardarActividad/:id", async (req, res) => {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
+
 
 
 router.put("/updateDate/:id", async (req,res)=>{
