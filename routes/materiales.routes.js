@@ -156,7 +156,7 @@ router.put("/materialEstado/:id", async (req, res) => {
         },
       });
       if (estado === 1) {
-        if (material.categoria.estado == 1) {
+        if (material.categoria.estado == 1 && material.cantidad != 0) {
           await prisma.materiales.update({
             where: {
               idMat: Number(id),
