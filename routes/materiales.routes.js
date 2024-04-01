@@ -150,9 +150,13 @@ router.put("/materialEstado/:id", async (req, res) => {
     const material = await prisma.materiales.findUnique({
         where: {
           idMat: Number(id),
-        },
-        include: {
-          categoria: true,
+        },select:{
+            cantidad:true,
+            categoria:{
+                select:{
+                    estado
+                }
+            }
         },
       });
       if (estado === 1) {
