@@ -170,7 +170,7 @@ router.put("/materialEstado/:id", async (req, res) => {
             message: "Estado del material actualizado con éxito",
             type: "green",
           });
-        } else if(material.categoria.estado==0){
+        } else if(material.categoria.estado==0 || material.cantidad === 0){
           return res.status(205).json({
             message: "No se puede editar el estado del material si el estado de la categoría es 0",
             type: "red",
