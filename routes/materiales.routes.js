@@ -190,6 +190,10 @@ router.put("/materialEstado/:id", async (req, res) => {
                 estado: parseInt(estado)
             }
         })
+        return res.status(200).json({
+            message: "Estado del material actualizado con éxito",
+            type: "green",
+          });
       }
   });
 
