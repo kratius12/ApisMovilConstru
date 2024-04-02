@@ -421,6 +421,7 @@ router.get("/obrasCli/:id", async (req, res) => {
       },
       include: {
         empleado: true,
+        detalle_obra:true
       },
     });
 
