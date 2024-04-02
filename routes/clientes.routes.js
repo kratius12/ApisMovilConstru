@@ -119,6 +119,7 @@ router.post('/cliente', async (req, res) => {
             cedula: cedula,
             fecha_nac: fecha_nac,
             constrasena: hash,
+            estado:1
         }
     })
 
