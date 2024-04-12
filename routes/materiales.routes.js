@@ -80,7 +80,7 @@ router.put("/material/:id", async (req, res) => {
             },
             data: {
                 nombre: ucfirst(nombre),
-                idCategoria: idCategoria
+                idCategoria: parseInt(idCategoria)
             }
         })
         return res.status(200).json({message: response})
